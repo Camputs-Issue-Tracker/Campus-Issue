@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-
+import { useUser  } from "./context/UserContext";
 export default function Index() {
   const router = useRouter();
+  const { globalSaveUsn } = useUser();
 
   const [usn, setUsn] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +12,7 @@ export default function Index() {
   const handleLogin = () => {
     // You can add validation or backend call here
     if (usn && password) {
+      globalSaveUsn(usn);
       router.push("/home");
     } else {
       alert("Please enter both USN and password");
