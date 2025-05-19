@@ -4,16 +4,20 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.2",
     "csv-parse": "^5.6.0",
     "csv-parser": "^3.2.0",
     "formidable": "^3.5.4",
     "framer-motion": "^12.9.2",
+    "jose": "^6.0.11",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.508.0",
     "next": "15.3.1",
@@ -32,5 +36,10 @@
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "eslintIgnore": [
+    "app/generated/prisma/**/*",
+    ".next/**/*",
+    "node_modules/**/*"
+  ]
 }

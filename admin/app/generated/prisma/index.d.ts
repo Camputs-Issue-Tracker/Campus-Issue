@@ -996,70 +996,52 @@ export namespace Prisma {
 
   export type AggregateStudent = {
     _count: StudentCountAggregateOutputType | null
-    _avg: StudentAvgAggregateOutputType | null
-    _sum: StudentSumAggregateOutputType | null
     _min: StudentMinAggregateOutputType | null
     _max: StudentMaxAggregateOutputType | null
   }
 
-  export type StudentAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type StudentSumAggregateOutputType = {
-    id: number | null
-  }
-
   export type StudentMinAggregateOutputType = {
-    id: number | null
     usn: string | null
     password: string | null
-    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type StudentMaxAggregateOutputType = {
-    id: number | null
     usn: string | null
     password: string | null
-    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type StudentCountAggregateOutputType = {
-    id: number
     usn: number
     password: number
-    name: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
-  export type StudentAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type StudentSumAggregateInputType = {
-    id?: true
-  }
-
   export type StudentMinAggregateInputType = {
-    id?: true
     usn?: true
     password?: true
-    name?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type StudentMaxAggregateInputType = {
-    id?: true
     usn?: true
     password?: true
-    name?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type StudentCountAggregateInputType = {
-    id?: true
     usn?: true
     password?: true
-    name?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -1101,18 +1083,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: StudentAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: StudentSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: StudentMinAggregateInputType
@@ -1143,20 +1113,16 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: StudentCountAggregateInputType | true
-    _avg?: StudentAvgAggregateInputType
-    _sum?: StudentSumAggregateInputType
     _min?: StudentMinAggregateInputType
     _max?: StudentMaxAggregateInputType
   }
 
   export type StudentGroupByOutputType = {
-    id: number
     usn: string
     password: string
-    name: string
+    createdAt: Date
+    updatedAt: Date
     _count: StudentCountAggregateOutputType | null
-    _avg: StudentAvgAggregateOutputType | null
-    _sum: StudentSumAggregateOutputType | null
     _min: StudentMinAggregateOutputType | null
     _max: StudentMaxAggregateOutputType | null
   }
@@ -1176,36 +1142,36 @@ export namespace Prisma {
 
 
   export type StudentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
     usn?: boolean
     password?: boolean
-    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     posts?: boolean | Student$postsArgs<ExtArgs>
     _count?: boolean | StudentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["student"]>
 
   export type StudentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
     usn?: boolean
     password?: boolean
-    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["student"]>
 
   export type StudentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
     usn?: boolean
     password?: boolean
-    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["student"]>
 
   export type StudentSelectScalar = {
-    id?: boolean
     usn?: boolean
     password?: boolean
-    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type StudentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usn" | "password" | "name", ExtArgs["result"]["student"]>
+  export type StudentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"usn" | "password" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
   export type StudentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     posts?: boolean | Student$postsArgs<ExtArgs>
     _count?: boolean | StudentCountOutputTypeDefaultArgs<ExtArgs>
@@ -1219,10 +1185,10 @@ export namespace Prisma {
       posts: Prisma.$PostPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
       usn: string
       password: string
-      name: string
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["student"]>
     composites: {}
   }
@@ -1306,8 +1272,8 @@ export namespace Prisma {
      * // Get first 10 Students
      * const students = await prisma.student.findMany({ take: 10 })
      * 
-     * // Only select the `id`
-     * const studentWithIdOnly = await prisma.student.findMany({ select: { id: true } })
+     * // Only select the `usn`
+     * const studentWithUsnOnly = await prisma.student.findMany({ select: { usn: true } })
      * 
      */
     findMany<T extends StudentFindManyArgs>(args?: SelectSubset<T, StudentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1351,9 +1317,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many Students and only return the `id`
-     * const studentWithIdOnly = await prisma.student.createManyAndReturn({
-     *   select: { id: true },
+     * // Create many Students and only return the `usn`
+     * const studentWithUsnOnly = await prisma.student.createManyAndReturn({
+     *   select: { usn: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -1442,9 +1408,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Students and only return the `id`
-     * const studentWithIdOnly = await prisma.student.updateManyAndReturn({
-     *   select: { id: true },
+     * // Update zero or more Students and only return the `usn`
+     * const studentWithUsnOnly = await prisma.student.updateManyAndReturn({
+     *   select: { usn: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -1647,10 +1613,10 @@ export namespace Prisma {
    * Fields of the Student model
    */
   interface StudentFieldRefs {
-    readonly id: FieldRef<"Student", 'Int'>
     readonly usn: FieldRef<"Student", 'String'>
     readonly password: FieldRef<"Student", 'String'>
-    readonly name: FieldRef<"Student", 'String'>
+    readonly createdAt: FieldRef<"Student", 'DateTime'>
+    readonly updatedAt: FieldRef<"Student", 'DateTime'>
   }
     
 
@@ -2087,80 +2053,82 @@ export namespace Prisma {
 
   export type AggregatePost = {
     _count: PostCountAggregateOutputType | null
-    _avg: PostAvgAggregateOutputType | null
-    _sum: PostSumAggregateOutputType | null
     _min: PostMinAggregateOutputType | null
     _max: PostMaxAggregateOutputType | null
   }
 
-  export type PostAvgAggregateOutputType = {
-    id: number | null
-    studentId: number | null
-  }
-
-  export type PostSumAggregateOutputType = {
-    id: number | null
-    studentId: number | null
-  }
-
   export type PostMinAggregateOutputType = {
-    id: number | null
+    id: string | null
+    title: string | null
     content: string | null
     imageUrl: string | null
+    status: string | null
+    isApproved: boolean | null
+    studentUsn: string | null
     createdAt: Date | null
-    studentId: number | null
+    updatedAt: Date | null
   }
 
   export type PostMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
+    title: string | null
     content: string | null
     imageUrl: string | null
+    status: string | null
+    isApproved: boolean | null
+    studentUsn: string | null
     createdAt: Date | null
-    studentId: number | null
+    updatedAt: Date | null
   }
 
   export type PostCountAggregateOutputType = {
     id: number
+    title: number
     content: number
     imageUrl: number
+    status: number
+    isApproved: number
+    studentUsn: number
     createdAt: number
-    studentId: number
+    updatedAt: number
     _all: number
   }
 
 
-  export type PostAvgAggregateInputType = {
-    id?: true
-    studentId?: true
-  }
-
-  export type PostSumAggregateInputType = {
-    id?: true
-    studentId?: true
-  }
-
   export type PostMinAggregateInputType = {
     id?: true
+    title?: true
     content?: true
     imageUrl?: true
+    status?: true
+    isApproved?: true
+    studentUsn?: true
     createdAt?: true
-    studentId?: true
+    updatedAt?: true
   }
 
   export type PostMaxAggregateInputType = {
     id?: true
+    title?: true
     content?: true
     imageUrl?: true
+    status?: true
+    isApproved?: true
+    studentUsn?: true
     createdAt?: true
-    studentId?: true
+    updatedAt?: true
   }
 
   export type PostCountAggregateInputType = {
     id?: true
+    title?: true
     content?: true
     imageUrl?: true
+    status?: true
+    isApproved?: true
+    studentUsn?: true
     createdAt?: true
-    studentId?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -2202,18 +2170,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: PostAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: PostSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: PostMinAggregateInputType
@@ -2244,21 +2200,21 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: PostCountAggregateInputType | true
-    _avg?: PostAvgAggregateInputType
-    _sum?: PostSumAggregateInputType
     _min?: PostMinAggregateInputType
     _max?: PostMaxAggregateInputType
   }
 
   export type PostGroupByOutputType = {
-    id: number
+    id: string
+    title: string
     content: string
     imageUrl: string | null
+    status: string
+    isApproved: boolean
+    studentUsn: string
     createdAt: Date
-    studentId: number
+    updatedAt: Date
     _count: PostCountAggregateOutputType | null
-    _avg: PostAvgAggregateOutputType | null
-    _sum: PostSumAggregateOutputType | null
     _min: PostMinAggregateOutputType | null
     _max: PostMaxAggregateOutputType | null
   }
@@ -2279,40 +2235,56 @@ export namespace Prisma {
 
   export type PostSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    title?: boolean
     content?: boolean
     imageUrl?: boolean
+    status?: boolean
+    isApproved?: boolean
+    studentUsn?: boolean
     createdAt?: boolean
-    studentId?: boolean
+    updatedAt?: boolean
     student?: boolean | StudentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["post"]>
 
   export type PostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    title?: boolean
     content?: boolean
     imageUrl?: boolean
+    status?: boolean
+    isApproved?: boolean
+    studentUsn?: boolean
     createdAt?: boolean
-    studentId?: boolean
+    updatedAt?: boolean
     student?: boolean | StudentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["post"]>
 
   export type PostSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    title?: boolean
     content?: boolean
     imageUrl?: boolean
+    status?: boolean
+    isApproved?: boolean
+    studentUsn?: boolean
     createdAt?: boolean
-    studentId?: boolean
+    updatedAt?: boolean
     student?: boolean | StudentDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["post"]>
 
   export type PostSelectScalar = {
     id?: boolean
+    title?: boolean
     content?: boolean
     imageUrl?: boolean
+    status?: boolean
+    isApproved?: boolean
+    studentUsn?: boolean
     createdAt?: boolean
-    studentId?: boolean
+    updatedAt?: boolean
   }
 
-  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "imageUrl" | "createdAt" | "studentId", ExtArgs["result"]["post"]>
+  export type PostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "content" | "imageUrl" | "status" | "isApproved" | "studentUsn" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
   export type PostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     student?: boolean | StudentDefaultArgs<ExtArgs>
   }
@@ -2329,11 +2301,15 @@ export namespace Prisma {
       student: Prisma.$StudentPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
+      title: string
       content: string
       imageUrl: string | null
+      status: string
+      isApproved: boolean
+      studentUsn: string
       createdAt: Date
-      studentId: number
+      updatedAt: Date
     }, ExtArgs["result"]["post"]>
     composites: {}
   }
@@ -2758,11 +2734,15 @@ export namespace Prisma {
    * Fields of the Post model
    */
   interface PostFieldRefs {
-    readonly id: FieldRef<"Post", 'Int'>
+    readonly id: FieldRef<"Post", 'String'>
+    readonly title: FieldRef<"Post", 'String'>
     readonly content: FieldRef<"Post", 'String'>
     readonly imageUrl: FieldRef<"Post", 'String'>
+    readonly status: FieldRef<"Post", 'String'>
+    readonly isApproved: FieldRef<"Post", 'Boolean'>
+    readonly studentUsn: FieldRef<"Post", 'String'>
     readonly createdAt: FieldRef<"Post", 'DateTime'>
-    readonly studentId: FieldRef<"Post", 'Int'>
+    readonly updatedAt: FieldRef<"Post", 'DateTime'>
   }
     
 
@@ -3192,10 +3172,10 @@ export namespace Prisma {
 
 
   export const StudentScalarFieldEnum: {
-    id: 'id',
     usn: 'usn',
     password: 'password',
-    name: 'name'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -3203,10 +3183,14 @@ export namespace Prisma {
 
   export const PostScalarFieldEnum: {
     id: 'id',
+    title: 'title',
     content: 'content',
     imageUrl: 'imageUrl',
+    status: 'status',
+    isApproved: 'isApproved',
+    studentUsn: 'studentUsn',
     createdAt: 'createdAt',
-    studentId: 'studentId'
+    updatedAt: 'updatedAt'
   };
 
   export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
@@ -3242,20 +3226,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
@@ -3284,16 +3254,23 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
+   * Reference to a field of type 'Boolean'
    */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
   /**
-   * Reference to a field of type 'Float[]'
+   * Reference to a field of type 'Int'
    */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
   /**
    * Deep Input Types
@@ -3304,222 +3281,261 @@ export namespace Prisma {
     AND?: StudentWhereInput | StudentWhereInput[]
     OR?: StudentWhereInput[]
     NOT?: StudentWhereInput | StudentWhereInput[]
-    id?: IntFilter<"Student"> | number
     usn?: StringFilter<"Student"> | string
     password?: StringFilter<"Student"> | string
-    name?: StringFilter<"Student"> | string
+    createdAt?: DateTimeFilter<"Student"> | Date | string
+    updatedAt?: DateTimeFilter<"Student"> | Date | string
     posts?: PostListRelationFilter
   }
 
   export type StudentOrderByWithRelationInput = {
-    id?: SortOrder
     usn?: SortOrder
     password?: SortOrder
-    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     posts?: PostOrderByRelationAggregateInput
   }
 
   export type StudentWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
     usn?: string
     AND?: StudentWhereInput | StudentWhereInput[]
     OR?: StudentWhereInput[]
     NOT?: StudentWhereInput | StudentWhereInput[]
     password?: StringFilter<"Student"> | string
-    name?: StringFilter<"Student"> | string
+    createdAt?: DateTimeFilter<"Student"> | Date | string
+    updatedAt?: DateTimeFilter<"Student"> | Date | string
     posts?: PostListRelationFilter
-  }, "id" | "usn">
+  }, "usn">
 
   export type StudentOrderByWithAggregationInput = {
-    id?: SortOrder
     usn?: SortOrder
     password?: SortOrder
-    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: StudentCountOrderByAggregateInput
-    _avg?: StudentAvgOrderByAggregateInput
     _max?: StudentMaxOrderByAggregateInput
     _min?: StudentMinOrderByAggregateInput
-    _sum?: StudentSumOrderByAggregateInput
   }
 
   export type StudentScalarWhereWithAggregatesInput = {
     AND?: StudentScalarWhereWithAggregatesInput | StudentScalarWhereWithAggregatesInput[]
     OR?: StudentScalarWhereWithAggregatesInput[]
     NOT?: StudentScalarWhereWithAggregatesInput | StudentScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Student"> | number
     usn?: StringWithAggregatesFilter<"Student"> | string
     password?: StringWithAggregatesFilter<"Student"> | string
-    name?: StringWithAggregatesFilter<"Student"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Student"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Student"> | Date | string
   }
 
   export type PostWhereInput = {
     AND?: PostWhereInput | PostWhereInput[]
     OR?: PostWhereInput[]
     NOT?: PostWhereInput | PostWhereInput[]
-    id?: IntFilter<"Post"> | number
+    id?: StringFilter<"Post"> | string
+    title?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
     imageUrl?: StringNullableFilter<"Post"> | string | null
+    status?: StringFilter<"Post"> | string
+    isApproved?: BoolFilter<"Post"> | boolean
+    studentUsn?: StringFilter<"Post"> | string
     createdAt?: DateTimeFilter<"Post"> | Date | string
-    studentId?: IntFilter<"Post"> | number
+    updatedAt?: DateTimeFilter<"Post"> | Date | string
     student?: XOR<StudentScalarRelationFilter, StudentWhereInput>
   }
 
   export type PostOrderByWithRelationInput = {
     id?: SortOrder
+    title?: SortOrder
     content?: SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    isApproved?: SortOrder
+    studentUsn?: SortOrder
     createdAt?: SortOrder
-    studentId?: SortOrder
+    updatedAt?: SortOrder
     student?: StudentOrderByWithRelationInput
   }
 
   export type PostWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: PostWhereInput | PostWhereInput[]
     OR?: PostWhereInput[]
     NOT?: PostWhereInput | PostWhereInput[]
+    title?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
     imageUrl?: StringNullableFilter<"Post"> | string | null
+    status?: StringFilter<"Post"> | string
+    isApproved?: BoolFilter<"Post"> | boolean
+    studentUsn?: StringFilter<"Post"> | string
     createdAt?: DateTimeFilter<"Post"> | Date | string
-    studentId?: IntFilter<"Post"> | number
+    updatedAt?: DateTimeFilter<"Post"> | Date | string
     student?: XOR<StudentScalarRelationFilter, StudentWhereInput>
   }, "id">
 
   export type PostOrderByWithAggregationInput = {
     id?: SortOrder
+    title?: SortOrder
     content?: SortOrder
     imageUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    isApproved?: SortOrder
+    studentUsn?: SortOrder
     createdAt?: SortOrder
-    studentId?: SortOrder
+    updatedAt?: SortOrder
     _count?: PostCountOrderByAggregateInput
-    _avg?: PostAvgOrderByAggregateInput
     _max?: PostMaxOrderByAggregateInput
     _min?: PostMinOrderByAggregateInput
-    _sum?: PostSumOrderByAggregateInput
   }
 
   export type PostScalarWhereWithAggregatesInput = {
     AND?: PostScalarWhereWithAggregatesInput | PostScalarWhereWithAggregatesInput[]
     OR?: PostScalarWhereWithAggregatesInput[]
     NOT?: PostScalarWhereWithAggregatesInput | PostScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Post"> | number
+    id?: StringWithAggregatesFilter<"Post"> | string
+    title?: StringWithAggregatesFilter<"Post"> | string
     content?: StringWithAggregatesFilter<"Post"> | string
     imageUrl?: StringNullableWithAggregatesFilter<"Post"> | string | null
+    status?: StringWithAggregatesFilter<"Post"> | string
+    isApproved?: BoolWithAggregatesFilter<"Post"> | boolean
+    studentUsn?: StringWithAggregatesFilter<"Post"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Post"> | Date | string
-    studentId?: IntWithAggregatesFilter<"Post"> | number
+    updatedAt?: DateTimeWithAggregatesFilter<"Post"> | Date | string
   }
 
   export type StudentCreateInput = {
     usn: string
     password: string
-    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     posts?: PostCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUncheckedCreateInput = {
-    id?: number
     usn: string
     password: string
-    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     posts?: PostUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUpdateInput = {
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     posts?: PostUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     posts?: PostUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentCreateManyInput = {
-    id?: number
     usn: string
     password: string
-    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type StudentUpdateManyMutationInput = {
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostCreateInput = {
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     student: StudentCreateNestedOneWithoutPostsInput
   }
 
   export type PostUncheckedCreateInput = {
-    id?: number
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
+    studentUsn: string
     createdAt?: Date | string
-    studentId: number
+    updatedAt?: Date | string
   }
 
   export type PostUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     student?: StudentUpdateOneRequiredWithoutPostsNestedInput
   }
 
   export type PostUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    studentUsn?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentId?: IntFieldUpdateOperationsInput | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostCreateManyInput = {
-    id?: number
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
+    studentUsn: string
     createdAt?: Date | string
-    studentId: number
+    updatedAt?: Date | string
   }
 
   export type PostUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
+    studentUsn?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentId?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -3537,6 +3553,17 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type PostListRelationFilter = {
     every?: PostWhereInput
     some?: PostWhereInput
@@ -3548,48 +3575,24 @@ export namespace Prisma {
   }
 
   export type StudentCountOrderByAggregateInput = {
-    id?: SortOrder
     usn?: SortOrder
     password?: SortOrder
-    name?: SortOrder
-  }
-
-  export type StudentAvgOrderByAggregateInput = {
-    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StudentMaxOrderByAggregateInput = {
-    id?: SortOrder
     usn?: SortOrder
     password?: SortOrder
-    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StudentMinOrderByAggregateInput = {
-    id?: SortOrder
     usn?: SortOrder
     password?: SortOrder
-    name?: SortOrder
-  }
-
-  export type StudentSumOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -3610,6 +3613,20 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -3625,15 +3642,9 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type StudentScalarRelationFilter = {
@@ -3648,36 +3659,38 @@ export namespace Prisma {
 
   export type PostCountOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
     content?: SortOrder
     imageUrl?: SortOrder
+    status?: SortOrder
+    isApproved?: SortOrder
+    studentUsn?: SortOrder
     createdAt?: SortOrder
-    studentId?: SortOrder
-  }
-
-  export type PostAvgOrderByAggregateInput = {
-    id?: SortOrder
-    studentId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type PostMaxOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
     content?: SortOrder
     imageUrl?: SortOrder
+    status?: SortOrder
+    isApproved?: SortOrder
+    studentUsn?: SortOrder
     createdAt?: SortOrder
-    studentId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type PostMinOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
     content?: SortOrder
     imageUrl?: SortOrder
+    status?: SortOrder
+    isApproved?: SortOrder
+    studentUsn?: SortOrder
     createdAt?: SortOrder
-    studentId?: SortOrder
-  }
-
-  export type PostSumOrderByAggregateInput = {
-    id?: SortOrder
-    studentId?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -3698,18 +3711,12 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type PostCreateNestedManyWithoutStudentInput = {
@@ -3730,6 +3737,10 @@ export namespace Prisma {
     set?: string
   }
 
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
   export type PostUpdateManyWithoutStudentNestedInput = {
     create?: XOR<PostCreateWithoutStudentInput, PostUncheckedCreateWithoutStudentInput> | PostCreateWithoutStudentInput[] | PostUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: PostCreateOrConnectWithoutStudentInput | PostCreateOrConnectWithoutStudentInput[]
@@ -3742,14 +3753,6 @@ export namespace Prisma {
     update?: PostUpdateWithWhereUniqueWithoutStudentInput | PostUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: PostUpdateManyWithWhereWithoutStudentInput | PostUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: PostScalarWhereInput | PostScalarWhereInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type PostUncheckedUpdateManyWithoutStudentNestedInput = {
@@ -3776,8 +3779,8 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type StudentUpdateOneRequiredWithoutPostsNestedInput = {
@@ -3786,17 +3789,6 @@ export namespace Prisma {
     upsert?: StudentUpsertWithoutPostsInput
     connect?: StudentWhereUniqueInput
     update?: XOR<XOR<StudentUpdateToOneWithWhereWithoutPostsInput, StudentUpdateWithoutPostsInput>, StudentUncheckedUpdateWithoutPostsInput>
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -3813,31 +3805,15 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
@@ -3857,6 +3833,31 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -3871,15 +3872,9 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -3910,31 +3905,34 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type PostCreateWithoutStudentInput = {
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PostUncheckedCreateWithoutStudentInput = {
-    id?: number
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PostCreateOrConnectWithoutStudentInput = {
@@ -3967,24 +3965,29 @@ export namespace Prisma {
     AND?: PostScalarWhereInput | PostScalarWhereInput[]
     OR?: PostScalarWhereInput[]
     NOT?: PostScalarWhereInput | PostScalarWhereInput[]
-    id?: IntFilter<"Post"> | number
+    id?: StringFilter<"Post"> | string
+    title?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
     imageUrl?: StringNullableFilter<"Post"> | string | null
+    status?: StringFilter<"Post"> | string
+    isApproved?: BoolFilter<"Post"> | boolean
+    studentUsn?: StringFilter<"Post"> | string
     createdAt?: DateTimeFilter<"Post"> | Date | string
-    studentId?: IntFilter<"Post"> | number
+    updatedAt?: DateTimeFilter<"Post"> | Date | string
   }
 
   export type StudentCreateWithoutPostsInput = {
     usn: string
     password: string
-    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type StudentUncheckedCreateWithoutPostsInput = {
-    id?: number
     usn: string
     password: string
-    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type StudentCreateOrConnectWithoutPostsInput = {
@@ -4006,41 +4009,59 @@ export namespace Prisma {
   export type StudentUpdateWithoutPostsInput = {
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentUncheckedUpdateWithoutPostsInput = {
-    id?: IntFieldUpdateOperationsInput | number
     usn?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostCreateManyStudentInput = {
-    id?: number
+    id?: string
+    title: string
     content: string
     imageUrl?: string | null
+    status?: string
+    isApproved?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PostUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostUncheckedUpdateWithoutStudentInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PostUncheckedUpdateManyWithoutStudentInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    isApproved?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -15,18 +15,24 @@ datasource db {
 }
 
 model Student {
-  id       Int    @id @default(autoincrement())
-  usn      String @unique
-  password String
-  name     String
-  posts    Post[]
+  usn       String   @id
+  password  String
+  posts     Post[] // Relation to posts
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  content   String
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  student   Student  @relation(fields: [studentId], references: [id])
-  studentId Int
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  imageUrl   String? // Optional image URL field
+  status     String   @default("active") // active, archived
+  isApproved Boolean  @default(false) // For admin approval
+  student    Student  @relation(fields: [studentUsn], references: [usn])
+  studentUsn String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([studentUsn])
 }

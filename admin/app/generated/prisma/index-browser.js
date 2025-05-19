@@ -121,18 +121,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 });
 
 exports.Prisma.StudentScalarFieldEnum = {
-  id: 'id',
   usn: 'usn',
   password: 'password',
-  name: 'name'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.PostScalarFieldEnum = {
   id: 'id',
+  title: 'title',
   content: 'content',
   imageUrl: 'imageUrl',
+  status: 'status',
+  isApproved: 'isApproved',
+  studentUsn: 'studentUsn',
   createdAt: 'createdAt',
-  studentId: 'studentId'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {

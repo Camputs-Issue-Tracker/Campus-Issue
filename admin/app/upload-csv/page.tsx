@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ChangeEvent, DragEvent } from "react";
 import Navbar from "../dashboard/page";
 import { Upload, FileText, AlertCircle, CheckCircle, X } from "lucide-react";
 
+type Status = "success" | "error" | null;
+
 export default function UploadCsvPage() {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState(null); // "success", "error", or null
+  const [status, setStatus] = useState<Status>(null);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] ?? null;
     if (selectedFile) {
       setFile(selectedFile);
@@ -22,7 +24,7 @@ export default function UploadCsvPage() {
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
   };
@@ -31,7 +33,7 @@ export default function UploadCsvPage() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
 
@@ -76,9 +78,10 @@ export default function UploadCsvPage() {
         setStatus("error");
         setMessage(`Error: ${data.error || "Upload failed"}`);
       }
-    } catch (err) {
+    } catch (error) {
       setStatus("error");
       setMessage("An error occurred while uploading. Please try again.");
+      console.error("Upload error:", error);
     } finally {
       setIsUploading(false);
     }

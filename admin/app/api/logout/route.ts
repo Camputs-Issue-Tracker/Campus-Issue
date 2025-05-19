@@ -2,13 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    // Create response
     const response = NextResponse.json(
       { success: true, message: "Logged out successfully" },
       { status: 200 }
     );
 
-    // Clear the token cookie with proper security settings
     response.cookies.set({
       name: "token",
       value: "",
