@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useUser } from '../context/UserContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [dateTime, setDateTime] = useState('');
+  const { usn, addPost } = useUser();
 
   const openCamera = async () => {
     // Ask for camera permissions
@@ -26,13 +30,25 @@ const Home = () => {
     }
   };
 
+  const handleOpenModal = () => {
+    const now = new Date();
+    setDateTime(now.toLocaleString()); // or use now.toISOString() for ISO format
+    setModalVisible(true);
+  };
+
   const handleSubmit = () => {
     if (!title.trim() || !description.trim()) {
       alert('Please fill in both title and description.');
       return;
     }
-    // Handle form submission here (send to backend or store)
-    console.log({ title, description, imageUri });
+    // Add post to context
+    addPost({
+      usn,
+      title,
+      description,
+      imageUri,
+      dateTime,
+    });
     // Reset form
     setTitle('');
     setDescription('');
@@ -42,7 +58,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.plusButton} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity style={styles.plusButton} onPress={handleOpenModal}>
         <Icon name="add" size={36} color="#fff" />
       </TouchableOpacity>
 
@@ -51,12 +67,22 @@ const Home = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Report a Problem</Text>
 
+            {/* Show date and time */}
+            <Text style={{ color: '#6b7280', marginBottom: 8 }}>{dateTime}</Text>
+
+            <TextInput
+              style={[styles.input, { backgroundColor: '#f9fafb', color: '#6b7280' }]}
+              value={usn}
+              editable={false}
+            />
+            
             <TextInput
               style={styles.input}
               placeholder="Enter Title"
               value={title}
               onChangeText={setTitle}
             />
+
 
             <TextInput
               style={[styles.input, { height: 100 }]}
@@ -66,13 +92,22 @@ const Home = () => {
               multiline
             />
 
-            {imageUri && (
-              <Image source={{ uri: imageUri }} style={styles.previewImage} />
+            {/* Show image preview with cross icon if imageUri exists */}
+            {imageUri ? (
+              <View style={styles.imagePreviewContainer}>
+                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+                <TouchableOpacity
+                  style={styles.removeImageButton}
+                  onPress={() => setImageUri(null)}
+                >
+                  <MaterialIcons name="cancel" size={28} color="#ef4444" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
+                <Text style={styles.cameraText}>📷 Attach Optional Proof</Text>
+              </TouchableOpacity>
             )}
-
-            <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
-              <Text style={styles.cameraText}>📷 Attach Optional Proof</Text>
-            </TouchableOpacity>
 
             <View style={styles.actionRow}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
@@ -182,5 +217,21 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#fff',
     fontWeight: '600'
-  }
+  },
+  imagePreviewContainer: {
+    position: 'relative',
+    marginTop: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 2,
+    elevation: 2,
+  },
 });
