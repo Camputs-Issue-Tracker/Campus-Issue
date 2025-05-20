@@ -7,12 +7,13 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useUser } from "./context/UserContext";
 
-const API_URL =
-  "https://admin-dash-45a67badz-arunsudhakar18s-projects.vercel.app"; // Your actual deployment URL
+const API_URL = "https://admin-dash-ecru.vercel.app";
 
 export default function Index() {
   const router = useRouter();
+  const { login } = useUser();
   const [usn, setUsn] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,13 +43,11 @@ export default function Index() {
         throw new Error(data.error || "Login failed");
       }
 
-      router.push({
-        pathname: "/home",
-        params: {
-          studentData: JSON.stringify(data.student),
-          message: data.message,
-        },
-      });
+      // Store user data in context
+      login(data.student);
+
+      // Navigate to home
+      router.push("/(tabs)/home");
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {

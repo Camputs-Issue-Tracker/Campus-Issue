@@ -25,11 +25,14 @@ model Post {
   id          String   @id @default(uuid())
   title       String
   content     String
-  imageUrl    String?  // Optional image URL field
-  status      String   @default("active") // active, archived
+  imageUrl    String?  
   isApproved  Boolean  @default(false) // For admin approval
   student     Student  @relation(fields: [studentUsn], references: [usn])
   studentUsn  String
+  // New fields for GPT analysis
+  priority    String?  // "urgent", "high", "medium", "low"
+  category    String?  // "academic", "infrastructure", "facility", "other"
+  analysis    String?  // Detailed analysis from GPT
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
