@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import Header from "../components/Header";
 import { Picker } from "@react-native-picker/picker";
-
+import { useRouter } from "expo-router";
+import { useUser } from "../context/UserContext";
 const API_URL = "https://admin-dash-ecru.vercel.app";
 
 const AllQueries = () => {
@@ -18,7 +19,7 @@ const AllQueries = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [filteredQueries, setFilteredQueries] = useState([]);
-
+  const { user} = useUser();
   useEffect(() => {
     fetchQueries();
   }, []);
@@ -29,11 +30,13 @@ const AllQueries = () => {
 
   const fetchQueries = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/posts`);
+      const response = await fetch(`${API_URL}/api/student-posts?usn=${user.usn}`);
       if (!response.ok) {
         throw new Error("Failed to fetch queries");
       }
+      console.log("Fetching queries for USN:", user.usn);
       const data = await response.json();
+      console.log("Queries fetched:", data.posts);
       setQueries(data.posts || []);
     } catch (error) {
       console.error("Error fetching queries:", error);

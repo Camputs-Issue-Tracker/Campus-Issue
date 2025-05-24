@@ -42,7 +42,7 @@ const YourPost = () => {
 
     try {
       console.log("Fetching posts for USN:", user.usn);
-      const response = await fetch(`${API_URL}/api/posts?usn=${user.usn}`);
+      const response = await fetch(`${API_URL}/api/student-posts?usn=${user.usn}`);
       console.log("Response status:", response.status);
       const responseText = await response.text();
       // console.log("Response body:", responseText);
