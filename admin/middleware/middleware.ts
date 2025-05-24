@@ -13,6 +13,9 @@ const publicRoutes = [
   "/admin-request",
 ];
 
+// List of protected routes that require admin authentication
+const protectedRoutes = ["/dashboard", "/upload-csv", "/admin"];
+
 interface DecodedToken {
   email: string;
   role: string;
@@ -27,6 +30,16 @@ export function middleware(req: NextRequest) {
   // Allow access to public routes
   if (publicRoutes.includes(pathname)) {
     console.log("✅ Middleware - Public route, allowing access");
+    return NextResponse.next();
+  }
+
+  // Check if the route is protected
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  if (!isProtectedRoute) {
+    console.log("✅ Middleware - Non-protected route, allowing access");
     return NextResponse.next();
   }
 
@@ -52,6 +65,15 @@ export function middleware(req: NextRequest) {
       console.log("❌ Middleware - Token expired");
       const loginUrl = new URL("/admin-login", req.url);
       loginUrl.searchParams.set("from", pathname);
+      loginUrl.searchParams.set("error", "session_expired");
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Verify admin role
+    if (decoded.role !== "admin") {
+      console.log("❌ Middleware - Insufficient permissions");
+      const loginUrl = new URL("/admin-login", req.url);
+      loginUrl.searchParams.set("error", "insufficient_permissions");
       return NextResponse.redirect(loginUrl);
     }
 
@@ -70,6 +92,7 @@ export function middleware(req: NextRequest) {
     console.log("❌ Middleware - Token verification failed:", error);
     const loginUrl = new URL("/admin-login", req.url);
     loginUrl.searchParams.set("from", pathname);
+    loginUrl.searchParams.set("error", "invalid_token");
     return NextResponse.redirect(loginUrl);
   }
 }
@@ -81,7 +104,7 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
     // Explicitly match protected routes
     "/dashboard/:path*",
-    "/upload-csv",
+    "/upload-csv/:path*",
     "/admin/:path*",
   ],
 };
