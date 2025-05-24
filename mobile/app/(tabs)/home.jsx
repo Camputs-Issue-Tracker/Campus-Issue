@@ -13,6 +13,8 @@ import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useUser } from "../context/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import Header from "../components/Header";
 
 const API_URL = "https://admin-dash-ecru.vercel.app";
 
@@ -35,7 +37,8 @@ const Home = () => {
     // Launch camera
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 0.7, // Reduced quality for better performance
+      base64: true, // Enable base64
     });
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
@@ -62,34 +65,22 @@ const Home = () => {
     try {
       setIsSubmitting(true);
 
-      // Create form data for image upload if exists
-      let imageUrl = null;
+      // Convert image to base64 if exists
+      let imageBase64 = null;
       if (imageUri) {
-        const formData = new FormData();
-        formData.append("file", {
-          uri: imageUri,
-          type: "image/jpeg",
-          name: "upload.jpg",
-        });
-
-        // Upload image first
-        const uploadResponse = await fetch(`${API_URL}/api/upload`, {
-          method: "POST",
-          body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error("Failed to upload image");
+        try {
+          const base64 = await FileSystem.readAsStringAsync(imageUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          imageBase64 = `data:image/jpeg;base64,${base64}`;
+        } catch (error) {
+          console.error("Error converting image to base64:", error);
+          Alert.alert("Error", "Failed to process image. Please try again.");
+          return;
         }
-
-        const uploadData = await uploadResponse.json();
-        imageUrl = uploadData.url;
       }
 
-      // Create post
+      // Create post with base64 image
       const response = await fetch(`${API_URL}/api/posts`, {
         method: "POST",
         headers: {
@@ -98,10 +89,11 @@ const Home = () => {
         body: JSON.stringify({
           title,
           content: description,
-          imageUrl,
+          imageBase64,
           studentUsn: user.usn,
         }),
       });
+      console.log(response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -126,6 +118,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
+      <Header title="Report Issue" />
       <TouchableOpacity style={styles.plusButton} onPress={handleOpenModal}>
         <Icon name="add" size={36} color="#fff" />
       </TouchableOpacity>
@@ -139,16 +132,6 @@ const Home = () => {
             <Text style={{ color: "#6b7280", marginBottom: 8 }}>
               {dateTime}
             </Text>
-
-            <TextInput
-              style={[
-                styles.input,
-                { backgroundColor: "#f9fafb", color: "#6b7280" },
-              ]}
-              value={user?.usn}
-              editable={false}
-            />
-
             <TextInput
               style={styles.input}
               placeholder="Enter Title"
@@ -167,7 +150,11 @@ const Home = () => {
             {/* Show image preview with cross icon if imageUri exists */}
             {imageUri ? (
               <View style={styles.imagePreviewContainer}>
-                <Image source={{ uri: imageUri }} style={styles.previewImage} />
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
+                />
                 <TouchableOpacity
                   style={styles.removeImageButton}
                   onPress={() => setImageUri(null)}
@@ -218,8 +205,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   plusButton: {
     position: "absolute",
@@ -231,11 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
   },
   modalOverlay: {
     flex: 1,
@@ -247,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 20,
-    elevation: 6,
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.2)",
   },
   modalTitle: {
     fontSize: 22,
@@ -258,71 +240,70 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 8,
-  },
-  cameraButton: {
-    marginVertical: 10,
-    padding: 10,
+    borderColor: "#e5e7eb",
     borderRadius: 8,
-    backgroundColor: "#f3f4f6",
-    alignItems: "center",
-  },
-  cameraText: {
+    padding: 12,
+    marginBottom: 16,
     fontSize: 16,
-    color: "#1e40af",
+  },
+  imagePreviewContainer: {
+    position: "relative",
+    marginBottom: 16,
   },
   previewImage: {
-    height: 120,
     width: "100%",
+    height: 200,
     borderRadius: 8,
-    marginTop: 10,
+  },
+  removeImageButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "white",
+    borderRadius: 14,
+    padding: 4,
+  },
+  cameraButton: {
+    backgroundColor: "#f3f4f6",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  cameraText: {
+    color: "#4b5563",
+    fontSize: 16,
   },
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 16,
   },
   cancelBtn: {
-    padding: 10,
-    backgroundColor: "#e5e7eb",
+    flex: 1,
+    padding: 12,
+    marginRight: 8,
     borderRadius: 8,
-    width: "45%",
-    alignItems: "center",
+    backgroundColor: "#f3f4f6",
   },
   cancelText: {
-    color: "#1f2937",
+    color: "#4b5563",
+    textAlign: "center",
+    fontSize: 16,
   },
   submitBtn: {
-    padding: 10,
-    backgroundColor: "#3b82f6",
+    flex: 1,
+    padding: 12,
+    marginLeft: 8,
     borderRadius: 8,
-    width: "45%",
-    alignItems: "center",
-  },
-  submitText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  imagePreviewContainer: {
-    position: "relative",
-    marginTop: 10,
-    marginBottom: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  removeImageButton: {
-    position: "absolute",
-    top: 2,
-    right: 2,
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 2,
-    elevation: 2,
+    backgroundColor: "#3b82f6",
   },
   submitBtnDisabled: {
-    backgroundColor: "#93c5fd",
+    opacity: 0.7,
+  },
+  submitText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
   },
 });

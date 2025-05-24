@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parse } from "csv-parse/sync";
 import { prisma } from "../../../lib/prisma";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 const SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -83,10 +84,13 @@ export async function POST(req: NextRequest) {
       }
 
       try {
+        // Hash the password before storing
+        const hashedPassword = await bcrypt.hash(row.password.trim(), 10);
+
         const created = await prisma.student.create({
           data: {
             usn: row.usn.trim(),
-            password: row.password.trim(),
+            password: hashedPassword,
           },
         });
         console.log("✅ Inserted student:", created.usn);

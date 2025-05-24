@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -37,7 +38,6 @@ export async function POST(request: Request) {
       include: {
         posts: {
           where: {
-            status: "active",
             isApproved: true,
           },
           orderBy: {
@@ -56,8 +56,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Compare passwords directly (plain text)
-    if (password !== student.password) {
+    // Compare passwords using bcrypt
+    const isPasswordValid = await bcrypt.compare(password, student.password);
+    if (!isPasswordValid) {
       console.log("Invalid password for USN:", usn);
       return NextResponse.json(
         { error: "Invalid USN or password" },
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error" + error },
+      { error: "Internal server error" },
       { status: 500, headers: corsHeaders }
     );
   }

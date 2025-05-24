@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs } from "expo-router";
 
 export default function Layout() {
   return (
@@ -10,7 +10,7 @@ export default function Layout() {
       <Tabs.Screen
         name="home"
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: "Home",
           tabBarIcon: () => null,
           headerShown: false, // Hide the header/title for Home
         }}
@@ -20,7 +20,15 @@ export default function Layout() {
         options={{
           tabBarIcon: () => null,
           headerShown: false, // Hide the header/title for Your Post
-          tabBarLabel: 'Your Post', 
+          tabBarLabel: "Your Post",
+        }}
+      />
+      <Tabs.Screen
+        name="allqueries"
+        options={{
+          tabBarIcon: () => null,
+          headerShown: false,
+          tabBarLabel: "All Queries",
         }}
       />
       {/* Add other tab screens here */}

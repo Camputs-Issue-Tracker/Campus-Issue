@@ -9,17 +9,29 @@ import {
   Alert,
 } from "react-native";
 import { useUser } from "../context/UserContext";
+import { useRouter } from "expo-router";
+import Header from "../components/Header";
 
 const API_URL = "https://admin-dash-ecru.vercel.app";
 
 const YourPost = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useUser();
+  const { user, logout } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Error", "Failed to logout. Please try again.");
+    }
+  };
 
   const fetchPosts = async () => {
     if (!user?.usn) {
@@ -29,14 +41,17 @@ const YourPost = () => {
     }
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/posts?studentUsn=${user.usn}`
-      );
+      console.log("Fetching posts for USN:", user.usn);
+      const response = await fetch(`${API_URL}/api/posts?usn=${user.usn}`);
+      console.log("Response status:", response.status);
+      const responseText = await response.text();
+      console.log("Response body:", responseText);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch posts");
+        throw new Error(`Failed to fetch posts: ${responseText}`);
       }
-      const data = await response.json();
-      setPosts(data);
+      const data = JSON.parse(responseText);
+      setPosts(data.posts || []);
     } catch (error) {
       Alert.alert("Error", error.message || "Failed to fetch posts");
     } finally {
@@ -101,6 +116,7 @@ const YourPost = () => {
 
   return (
     <View style={styles.container}>
+      <Header title="Your Posts" />
       <FlatList
         data={posts}
         renderItem={renderPost}
@@ -127,10 +143,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
   },
   postHeader: {
     flexDirection: "row",

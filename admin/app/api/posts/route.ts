@@ -1,50 +1,98 @@
 import { NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import OpenAI from "openai";
+import { CohereClient } from "cohere-ai";
+import axios from "axios";
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const cohere = new CohereClient({
+  token: process.env.COHERE_API_KEY || "",
 });
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, X-Requested-With",
+  "Access-Control-Max-Age": "86400",
 };
 
+// Function to upload image to ImageBB
+async function uploadImageToImageBB(imageBase64: string) {
+  try {
+    const formData = new FormData();
+    formData.append("image", imageBase64);
+
+    const response = await axios.post(
+      `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (response.data.success) {
+      return response.data.data.url;
+    }
+    throw new Error("Failed to upload image to ImageBB");
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    throw error;
+  }
+}
+
+// Handle OPTIONS request
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
 // Get posts for a specific student
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const usn = searchParams.get("usn");
-
-    if (!usn) {
-      return NextResponse.json(
-        { error: "USN is required" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
+    console.log("Fetching all posts...");
     const posts = await prisma.post.findMany({
-      where: {
-        studentUsn: usn,
-      },
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        student: {
+          select: {
+            usn: true,
+          },
+        },
+      },
     });
 
-    return NextResponse.json({ posts }, { headers: corsHeaders });
+    console.log(`Found ${posts.length} posts`);
+
+    // Transform the data to include studentUsn
+    const transformedPosts = posts.map((post) => ({
+      ...post,
+      studentUsn: post.student.usn,
+      student: undefined, // Remove the nested student object
+    }));
+
+    return NextResponse.json(
+      { posts: transformedPosts },
+      {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500, headers: corsHeaders }
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 }
@@ -53,7 +101,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, content, imageUrl, studentUsn } = body;
+    const { title, content, imageBase64, studentUsn } = body;
+    console.log(title, content, studentUsn);
 
     if (!title || !content || !studentUsn) {
       return NextResponse.json(
@@ -76,61 +125,85 @@ export async function POST(request: Request) {
       );
     }
 
-    // Analyze the post content using GPT
-    const analysisPrompt = `Analyze the following campus issue report and provide:
-1. Priority level (urgent, high, medium, low)
-2. Category (academic, infrastructure, facility, other)
-3. Brief analysis of the issue
+    // Upload image to ImageBB if provided
+    let imageUrl = null;
+    if (imageBase64) {
+      try {
+        imageUrl = await uploadImageToImageBB(imageBase64);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        return NextResponse.json(
+          { error: "Failed to upload image" },
+          { status: 500, headers: corsHeaders }
+        );
+      }
+    }
+
+    // Analyze the post content using Cohere
+    const analysisPrompt = `Analyze the following campus issue report and determine if it's valid. A valid report should:
+1. Have a clear and specific title
+2. Contain meaningful content related to campus issues
+3. Not contain spam, inappropriate content, or unrelated topics
 
 Title: ${title}
 Content: ${content}
 
-Respond in JSON format:
+If the content is valid, provide:
+1. Priority level (urgent, high, medium, low)
+2. Category (academic, infrastructure, facility, other)
+3. Brief analysis of the issue
+
+If the content is invalid, respond with:
 {
+  "isValid": false,
+  "reason": "detailed reason why the content is invalid"
+}
+
+If the content is valid, respond with:
+{
+  "isValid": true,
   "priority": "priority_level",
   "category": "category",
   "analysis": "brief_analysis"
 }`;
 
-    const gptResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert at analyzing campus issues and determining their priority and category.",
-        },
-        {
-          role: "user",
-          content: analysisPrompt,
-        },
-      ],
+    const response = await cohere.generate({
+      model: "command",
+      prompt: analysisPrompt,
+      maxTokens: 300,
       temperature: 0.7,
+      k: 0,
+      stopSequences: [],
+      returnLikelihoods: "NONE",
     });
 
-    const gptContent = gptResponse.choices[0].message.content;
+    const gptContent = response.generations[0].text;
+
     if (!gptContent) {
-      throw new Error("GPT analysis failed to generate content");
+      throw new Error("Cohere analysis failed to generate content");
     }
 
     const analysisResult = JSON.parse(gptContent) as {
-      priority: string;
-      category: string;
-      analysis: string;
+      isValid: boolean;
+      reason?: string;
+      priority?: string;
+      category?: string;
+      analysis?: string;
     };
 
-    // Create the post with GPT analysis
-    type PostCreateData = {
-      title: string;
-      content: string;
-      imageUrl?: string | null;
-      studentUsn: string;
-      priority?: string | null;
-      category?: string | null;
-      analysis?: string | null;
-    };
+    // If content is not valid, return error response
+    if (!analysisResult.isValid) {
+      return NextResponse.json(
+        {
+          error: "Invalid post content",
+          reason: analysisResult.reason,
+        },
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
-    const postData: PostCreateData = {
+    // Create the post with Cohere analysis only if content is valid
+    const postData = {
       title,
       content,
       imageUrl,
