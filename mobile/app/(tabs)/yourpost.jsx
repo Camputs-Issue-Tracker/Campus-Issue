@@ -45,7 +45,7 @@ const YourPost = () => {
       const response = await fetch(`${API_URL}/api/posts?usn=${user.usn}`);
       console.log("Response status:", response.status);
       const responseText = await response.text();
-      console.log("Response body:", responseText);
+      // console.log("Response body:", responseText);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch posts: ${responseText}`);
@@ -81,20 +81,23 @@ const YourPost = () => {
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>
         <Text style={styles.postTitle}>{item.title}</Text>
-        <TouchableOpacity
-          onPress={() => handleDelete(item.id)}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
       </View>
       <Text style={styles.postContent}>{item.content}</Text>
       {item.imageUrl && (
         <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
       )}
       <Text style={styles.postDate}>
+        Is Approved : {item.isApproved ? "Yes" : "No"}
+      </Text>
+      <Text style={styles.postDate}>
         Posted on: {new Date(item.createdAt).toLocaleString()}
       </Text>
+        <TouchableOpacity
+          onPress={() => handleDelete(item.id)}
+          style={styles.deleteButton}
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
     </View>
   );
 
@@ -149,12 +152,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 9,
   },
   postTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#1f2937",
+    color: "#3b82f6",
   },
   postContent: {
     fontSize: 16,
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   deleteButton: {
-    backgroundColor: "#ef4444",
+    backgroundColor: "#3b82f6", 
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -181,5 +184,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14,
     fontWeight: "500",
+    textAlign: "center",
   },
 });
