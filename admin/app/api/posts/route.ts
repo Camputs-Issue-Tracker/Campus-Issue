@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { CohereClient } from "cohere-ai";
 import axios from "axios";
@@ -48,9 +48,9 @@ export async function OPTIONS() {
 }
 
 // Get posts for a specific student
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    console.log("Fetching all posts...");
+    // Get all posts with student information
     const posts = await prisma.post.findMany({
       orderBy: {
         createdAt: "desc",
@@ -64,18 +64,43 @@ export async function GET() {
       },
     });
 
-    console.log(`Found ${posts.length} posts`);
-
-    // Transform the data to include studentUsn
-    const transformedPosts = posts.map((post) => ({
-      ...post,
+    // Format the response
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      imageUrl: post.imageUrl,
+      isApproved: post.isApproved,
+      status: post.status,
+      priority: post.priority,
+      category: post.category,
+      analysis: post.analysis,
       studentUsn: post.student.usn,
-      student: undefined, // Remove the nested student object
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
     }));
 
+    // Get total counts for dashboard stats
+    const totalStudents = await prisma.student.count();
+    const totalPosts = posts.length;
+    const totalApprovedPosts = posts.filter((post) => post.isApproved).length;
+    const totalPendingPosts = posts.filter(
+      (post) => post.status === "pending"
+    ).length;
+
     return NextResponse.json(
-      { posts: transformedPosts },
       {
+        success: true,
+        stats: {
+          totalStudents,
+          totalPosts,
+          totalApprovedPosts,
+          totalPendingPosts,
+        },
+        posts: formattedPosts,
+      },
+      {
+        status: 200,
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
@@ -85,7 +110,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch posts" },
       {
         status: 500,
         headers: {
@@ -94,6 +119,8 @@ export async function GET() {
         },
       }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { LogOut, Filter, CheckCircle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Header from "@/components/Header";
 
 interface Post {
   id: string;
@@ -19,6 +20,13 @@ interface Post {
   status: string;
 }
 
+interface DashboardStats {
+  totalStudents: number;
+  totalPosts: number;
+  totalApprovedPosts: number;
+  totalPendingPosts: number;
+}
+
 export default function Dashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +34,12 @@ export default function Dashboard() {
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalStudents: 0,
+    totalPosts: 0,
+    totalApprovedPosts: 0,
+    totalPendingPosts: 0,
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -53,13 +67,13 @@ export default function Dashboard() {
       }
 
       const data = await response.json();
-      console.log("Received data:", data);
 
-      if (!data.posts || !Array.isArray(data.posts)) {
-        throw new Error("Invalid response format: posts array is missing");
+      if (!data.success) {
+        throw new Error("Failed to fetch posts");
       }
 
       setPosts(data.posts);
+      setStats(data.stats);
     } catch (error) {
       console.error("Error fetching posts:", error);
       setError(
@@ -87,26 +101,6 @@ export default function Dashboard() {
     }
 
     setFilteredPosts(filtered);
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority?.toLowerCase()) {
-      case "urgent":
-        return "bg-red-500";
-      case "high":
-        return "bg-orange-500";
-      case "medium":
-        return "bg-yellow-500";
-      case "low":
-        return "bg-green-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  const handleLogout = () => {
-    // Clear any admin session/tokens here
-    router.push("/admin-login");
   };
 
   const handleStatusChange = async (postId: string, newStatus: string) => {
@@ -137,11 +131,29 @@ export default function Dashboard() {
             : post
         )
       );
+
+      // Refresh posts to update stats
+      fetchPosts();
     } catch (error) {
       console.error("Error updating post status:", error);
       setError(
         error instanceof Error ? error.message : "Failed to update post status"
       );
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "urgent":
+        return "bg-red-500";
+      case "high":
+        return "bg-orange-500";
+      case "medium":
+        return "bg-yellow-500";
+      case "low":
+        return "bg-green-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
@@ -186,19 +198,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="flex justify-between items-center p-4 bg-white shadow-lg">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-2 transition-colors"
-          >
-            <LogOut size={20} />
-            Logout
-          </motion.button>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
         <div className="flex justify-center items-center h-[calc(100vh-64px)]">
           <motion.div
             animate={{ rotate: 360 }}
@@ -212,19 +213,8 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="flex justify-between items-center p-4 bg-white shadow-lg">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-2 transition-colors"
-          >
-            <LogOut size={20} />
-            Logout
-          </motion.button>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -248,26 +238,45 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="flex justify-between items-center p-4 bg-white shadow-lg">
-        <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleLogout}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-2 transition-colors"
-        >
-          <LogOut size={20} />
-          Logout
-        </motion.button>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Total Students
+            </h3>
+            <p className="text-3xl font-bold text-blue-600 mt-2">
+              {stats.totalStudents}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-700">Total Posts</h3>
+            <p className="text-3xl font-bold text-green-600 mt-2">
+              {stats.totalPosts}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Approved Posts
+            </h3>
+            <p className="text-3xl font-bold text-purple-600 mt-2">
+              {stats.totalApprovedPosts}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Pending Posts
+            </h3>
+            <p className="text-3xl font-bold text-yellow-600 mt-2">
+              {stats.totalPendingPosts}
+            </p>
+          </div>
+        </div>
 
-      <div className="p-4 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 bg-white p-6 rounded-xl shadow-lg"
-        >
+        {/* Filters */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -303,130 +312,112 @@ export default function Dashboard() {
               </select>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid gap-6"
-        >
-          <AnimatePresence>
-            {filteredPosts.length === 0 ? (
+        {/* Posts List */}
+        <div className="space-y-6">
+          {filteredPosts.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 bg-white rounded-xl shadow-lg">
+              No posts found
+            </div>
+          ) : (
+            filteredPosts.map((post) => (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-12 text-gray-500 bg-white rounded-xl shadow-lg"
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6"
               >
-                No posts found
-              </motion.div>
-            ) : (
-              filteredPosts.map((post) => (
-                <motion.div
-                  key={post.id}
-                  variants={itemVariants}
-                  layout
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      {post.title}
-                    </h2>
-                    <div className="flex gap-2">
-                      <motion.span
-                        whileHover={{ scale: 1.05 }}
-                        className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getPriorityColor(
-                          post.priority
-                        )}`}
-                      >
-                        {post.priority?.toUpperCase() || "UNKNOWN"}
-                      </motion.span>
-                      <motion.span
-                        whileHover={{ scale: 1.05 }}
-                        className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getStatusColor(
-                          post.status
-                        )}`}
-                      >
-                        {post.status?.toUpperCase() || "PENDING"}
-                      </motion.span>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-4 whitespace-pre-wrap">
-                    {post.content}
-                  </p>
-                  {post.imageUrl && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="mb-4"
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    {post.title}
+                  </h2>
+                  <div className="flex gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getPriorityColor(
+                        post.priority
+                      )}`}
                     >
-                      <img
-                        src={post.imageUrl}
-                        alt="Post attachment"
-                        className="w-full h-48 object-cover rounded-lg shadow-md"
-                      />
-                    </motion.div>
-                  )}
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-                      <span>Posted by: {post.studentUsn}</span>
-                      <span>{new Date(post.createdAt).toLocaleString()}</span>
+                      {post.priority?.toUpperCase() || "UNKNOWN"}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getStatusColor(
+                        post.status
+                      )}`}
+                    >
+                      {post.status?.toUpperCase() || "PENDING"}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4 whitespace-pre-wrap">
+                  {post.content}
+                </p>
+                {post.imageUrl && (
+                  <div className="mb-4">
+                    <img
+                      src={post.imageUrl}
+                      alt="Post attachment"
+                      className="w-full h-48 object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
+                    <span>Posted by: {post.studentUsn}</span>
+                    <span>{new Date(post.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Category:{" "}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {post.category}
+                      </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">
-                          Category:{" "}
-                        </span>
-                        <span className="text-sm text-gray-600">
-                          {post.category}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">
-                          Analysis:{" "}
-                        </span>
-                        <span className="text-sm text-gray-600">
-                          {post.analysis}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <motion.button
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                        onClick={() => handleStatusChange(post.id, "approved")}
-                        className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${
-                          post.status === "approved"
-                            ? "bg-green-600"
-                            : "bg-green-500 hover:bg-green-600"
-                        }`}
-                      >
-                        <CheckCircle size={18} />
-                        Approve
-                      </motion.button>
-                      <motion.button
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                        onClick={() => handleStatusChange(post.id, "rejected")}
-                        className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${
-                          post.status === "rejected"
-                            ? "bg-red-600"
-                            : "bg-red-500 hover:bg-red-600"
-                        }`}
-                      >
-                        <XCircle size={18} />
-                        Reject
-                      </motion.button>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Analysis:{" "}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {post.analysis}
+                      </span>
                     </div>
                   </div>
-                </motion.div>
-              ))
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+                  <div className="flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleStatusChange(post.id, "approved")}
+                      className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${
+                        post.status === "approved"
+                          ? "bg-green-600"
+                          : "bg-green-500 hover:bg-green-600"
+                      }`}
+                    >
+                      <CheckCircle size={18} />
+                      Approve
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleStatusChange(post.id, "rejected")}
+                      className={`px-4 py-2 rounded-lg text-white flex items-center gap-2 ${
+                        post.status === "rejected"
+                          ? "bg-red-600"
+                          : "bg-red-500 hover:bg-red-600"
+                      }`}
+                    >
+                      <XCircle size={18} />
+                      Reject
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </div>
+      </main>
     </div>
   );
 }
