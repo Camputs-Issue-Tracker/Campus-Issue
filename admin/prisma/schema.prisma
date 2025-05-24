@@ -27,11 +27,12 @@ model Post {
   content     String
   imageUrl    String?  
   isApproved  Boolean  @default(false) // For admin approval
+  status      String   @default("pending") // pending, approved, rejected
   student     Student  @relation(fields: [studentUsn], references: [usn])
   studentUsn  String
   priority    String?  // "urgent", "high", "medium", "low"
   category    String?  // "academic", "infrastructure", "facility", "other"
-  analysis    String?  // Detailed analysis from GPT
+  analysis    String?  // Detailed analysis
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
